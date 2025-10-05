@@ -39,14 +39,6 @@ wandb/
 *.pickle
 *.joblib
 
-# Images / plots / outputs
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.pdf
-*.svg
-
 # OS / Editor files
 .DS_Store
 Thumbs.db

@@ -1,11 +1,12 @@
 # Bibliography Manager (Tkinter + SQLite)
 
 ## Project Layout
+```text
 BibliographyManagerModular/
 ├─ bibliography_manager/
 │  ├─ __init__.py
 │  ├─ app.py                # Entry point (python -m bibliography_manager.app)
-│  ├─ db.py                 # SQLite database layer
+│  ├─ db.py                 # SQLite database layer (PRAGMA foreign_keys=ON)
 │  ├─ bibtex.py             # BibTeX exporter utilities
 │  ├─ services/             # App/business logic
 │  │  ├─ __init__.py
@@ -15,6 +16,7 @@ BibliographyManagerModular/
 │     ├─ __init__.py
 │     └─ main_window.py
 └─ README.md
+```
 
 ## Usage
 ```bash

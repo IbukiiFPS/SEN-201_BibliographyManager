@@ -39,7 +39,6 @@ wandb/
 *.pickle
 *.joblib
 
-
 # OS / Editor files
 .DS_Store
 Thumbs.db

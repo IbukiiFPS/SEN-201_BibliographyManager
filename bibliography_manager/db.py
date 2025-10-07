@@ -26,4 +26,10 @@ class BibliographyDB:
                 tags TEXT,
                 created_at TEXT NOT NULL
             )''')
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS refsets (
+                id INTEGER PRIMARY KEY,
+                name TEXT UNIQUE NOT NULL,
+                created_at TEXT NOT NULL
+            )''')
         self.conn.commit()

@@ -32,4 +32,12 @@ class BibliographyDB:
                 name TEXT UNIQUE NOT NULL,
                 created_at TEXT NOT NULL
             )''')
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS set_entries (
+                set_id INTEGER,
+                entry_id INTEGER,
+                PRIMARY KEY(set_id, entry_id),
+                FOREIGN KEY(set_id) REFERENCES refsets(id) ON DELETE CASCADE,
+                FOREIGN KEY(entry_id) REFERENCES entries(id) ON DELETE CASCADE
+            )''')
         self.conn.commit()

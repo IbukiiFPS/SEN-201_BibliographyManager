@@ -23,17 +23,4 @@ class DatabaseConnector:
 
     def close(self):
         self.SessionLocal.remove()
-        
-    def update(self, instance, **updates):
-        pass
-    
-    def query(self, model, **filters):
-        pass
-        
-    def alter(self, instance, **updates):
-        pass
-        
-    def delete(self, instance):
-        pass
-    
 

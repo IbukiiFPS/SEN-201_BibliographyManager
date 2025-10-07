@@ -41,3 +41,27 @@ class BibliographyDB:
                 FOREIGN KEY(entry_id) REFERENCES entries(id) ON DELETE CASCADE
             )''')
         self.conn.commit()
+
+    def add_entry(self, authors: str, title: str, **kwargs) -> int:
+        if not authors.strip() or not title.strip():
+            raise ValueError("Authors and Title are required")
+        created_at = datetime.utcnow().isoformat()
+        cols = ["authors","title","venue","year","volume","number","pages","doi","url","tags","created_at"]
+        vals = [authors.strip(), title.strip(),
+                kwargs.get("venue"), kwargs.get("year"), kwargs.get("volume"),
+                kwargs.get("number"), kwargs.get("pages"), kwargs.get("doi"),
+                kwargs.get("url"), kwargs.get("tags"), created_at]
+        qmarks = ",".join(["?"]*len(cols))
+        sql = f"INSERT INTO entries ({','.join(cols)}) VALUES ({qmarks})"
+        c = self.conn.cursor()
+        c.execute(sql, vals)
+        self.conn.commit()
+        return c.lastrowid
+
+    def list_entries(self):
+        c = self.conn.cursor()
+        c.execute("SELECT id, authors, title, venue, year, tags, created_at FROM entries ORDER BY created_at DESC")
+        return c.fetchall()
+
+    def close(self):
+        self.conn.close()

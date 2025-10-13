@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+from typing import cast
 
 DB_FILE = "bibliography.db"
 
@@ -56,7 +57,7 @@ class BibliographyDB:
         c = self.conn.cursor()
         c.execute(sql, vals)
         self.conn.commit()
-        return c.lastrowid
+        return cast(int, c.lastrowid)
 
     def list_entries(self):
         c = self.conn.cursor()

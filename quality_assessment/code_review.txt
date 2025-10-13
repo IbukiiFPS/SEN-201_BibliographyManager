@@ -1,0 +1,40 @@
+PPDJ Code Review | Scribe Record
+
+Code under review: bibliography_manager/db.py
+
+Code Observations
+
+1.  The schema captures three core entities: entries, refsets, and join
+    table set_entries.
+2.  Correct use of SQLite foreign key enforcement via PRAGMA.
+3.  Writes are parameterized (prevents SQL injection).
+4.  Missing indexes and some integrity constraints; return types and
+    lifecycle management can be hardened.
+
+Detailed Findings
+
+The database schema currently allows invalid year values, such as negatives or far-future dates, and lacks constraints on doi and url, while the refsets table’s name field does not enforce case-insensitive uniqueness. Performance could be affected due to missing indexes on frequently queried fields like created_at, year, and tags. The timestamp generation uses a naive UTC format without a Z suffix, which may lead to ambiguity in time parsing. Error handling is limited, as the add_entry function only checks for empty author and title fields and does not properly surface duplicate DOI errors. Lastly, extensibility is restricted since update and delete operations are not yet implemented.
+
+Annotated Snippets
+
+    # Finding #3 (time): prefer explicit UTC "Z" or epoch
+    from datetime import datetime, timezone
+    created_at = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+
+    -- Finding #1 and #2 (integrity & indexes)
+    CREATE TABLE IF NOT EXISTS entries (
+      id INTEGER PRIMARY KEY,
+      authors TEXT NOT NULL,
+      title TEXT NOT NULL,
+      venue TEXT,
+      year INTEGER CHECK (year BETWEEN 1800 AND CAST(strftime('%Y','now') AS INTEGER)),
+      volume TEXT,
+      number TEXT,
+      pages TEXT,
+      doi TEXT UNIQUE,
+      url TEXT UNIQUE,
+      tags TEXT,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_entries_created_at ON entries(created_at);
+    CREATE INDEX IF NOT EXISTS idx_entries_year ON entries(year);

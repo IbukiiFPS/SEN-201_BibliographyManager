@@ -26,7 +26,6 @@ class AuthorRepository:
                 raise
 
     # ---------- READ ----------
-
     def get_all_authors(self) -> list[Author]:
         return self.db_session.query(Author).all()
     

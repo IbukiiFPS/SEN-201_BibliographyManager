@@ -2,7 +2,7 @@
 
 ## Project Layout
 ```text
-BibliographyManagerModular/
+SEN-201_BibliographyManager/
 ├─ bibliography_manager/
 │  ├─ __init__.py
 │  ├─ app.py                # Entry point (python -m bibliography_manager.app)

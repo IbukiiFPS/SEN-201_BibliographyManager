@@ -55,4 +55,5 @@ dist/
 .coverage
 .tox/
 .pytest_cache/
-htmlcov/
+htmlcov/__pycache__/
+*.pyc

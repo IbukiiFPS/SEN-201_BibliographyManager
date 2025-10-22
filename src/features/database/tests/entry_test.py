@@ -74,7 +74,6 @@ def test_list_entries_no_match(temp_db):
     assert len(entries) == 0
     
 
-
 # Get entry ID by title
 def test_get_entry_id(temp_db):
     database = temp_db

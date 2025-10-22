@@ -1,5 +1,5 @@
 import pytest
-import features.database.implentaions.db as db
+import features.database.implementations.db as db
 import conftest
 
 # Add entry tests
@@ -50,6 +50,8 @@ def test_add_entry_empty_optional_field(temp_db):
 # List entries tests
 def test_list_entries(temp_db):
     database = temp_db
+    database.add_entry(authors="Doe, J.", title="First Entry")
+    database.add_entry(authors="Smith, A.", title="Second Entry")
     entries = database.list_entries()
     assert isinstance(entries, list)
     for entry in entries:

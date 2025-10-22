@@ -1,5 +1,3 @@
-import features.database.implentaions.db as db
-
 # create entry set tests
 def test_create_entry_set(temp_db):
     database = temp_db
@@ -44,10 +42,21 @@ def test_add_and_remove_entry_in_set(temp_db):
     entries_in_set = database.list_entries_in_set(set_id)
     assert any(e[0] == entry_id for e in entries_in_set)
     
-    
+def test_remove_entry_from_set(temp_db):
+    database = temp_db
+    set_id = database.create_refset("Set for Remove Entry Test")
+    kwargs = {
+        "authors": "Doe, J.",
+        "title": "Sample Entry for Removal Test"
+    }
+    entry_id = database.add_entry(**kwargs)
+    database.add_entry_to_set(set_id, entry_id)
     database.remove_entry_from_set(set_id, entry_id)
     entries_in_set_after_removal = database.list_entries_in_set(set_id)
     assert all(e[0] != entry_id for e in entries_in_set_after_removal)
+
+    entries_in_set = database.list_entries_in_set(set_id)
+    assert all(e[0] != entry_id for e in entries_in_set)
 
     
 def test_add_existing_entry_to_set(temp_db):

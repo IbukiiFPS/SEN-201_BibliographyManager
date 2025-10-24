@@ -1,5 +1,5 @@
 import pytest
-import features.database.implementations.db as db
+import features.database.db as db
 import conftest
 
 # Add entry tests

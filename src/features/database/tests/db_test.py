@@ -1,4 +1,4 @@
-import features.database.implementations.db as db
+import features.database.db as db
 import pytest
 
 def test_connect_db(temp_db):

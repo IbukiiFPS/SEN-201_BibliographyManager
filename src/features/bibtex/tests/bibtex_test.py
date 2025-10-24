@@ -1,5 +1,5 @@
 
-import features.bibtex.implementations.bibtex as bibtex
+import features.bibtex.bibtex as bibtex
 
 # create entry set tests
 def test_export_bibtex(temp_db):

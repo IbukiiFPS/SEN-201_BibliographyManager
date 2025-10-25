@@ -1,4 +1,4 @@
 # src/features/bibtex/__init__.py
-import features.bibtex.bibtex as bibtex
+from .bibtex import entry_to_bibtex, escape_bibtex
 
-__all__ = ['bibtex']
+__all__ = ['entry_to_bibtex', 'escape_bibtex']

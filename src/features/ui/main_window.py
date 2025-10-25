@@ -163,6 +163,10 @@ class BibliographyApp(tk.Tk):
         if year_val and not re.match(r'^\d{4}$', year_val):
             raise ValueError('Year must be a 4-digit year')
 
+        doi = none_if_empty(self.form_vars['DOI'].get() or "")
+        if doi and not re.match(r'^10.\d{4,9}/[-._;()/:A-Z0-9]+$', doi, re.IGNORECASE):
+            raise ValueError('DOI format is invalid')
+        
         data = {
             'authors': authors,
             'title': title,

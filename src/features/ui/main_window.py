@@ -160,7 +160,7 @@ class BibliographyApp(tk.Tk):
             return x if x != "" else None
 
         year_val = none_if_empty(self.form_vars['Year'].get() or "")
-        if year_val and not re.match(r'^\\d{4}$', year_val):
+        if year_val and not re.match(r'^\d{4}$', year_val):
             raise ValueError('Year must be a 4-digit year')
 
         data = {

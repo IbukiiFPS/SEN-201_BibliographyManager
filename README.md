@@ -3,18 +3,27 @@
 ## Project Layout
 ```text
 SEN-201_BibliographyManager/
-├─ bibliography_manager/
-│  ├─ __init__.py
-│  ├─ app.py                # Entry point (python -m bibliography_manager.app)
-│  ├─ db.py                 # SQLite database layer (PRAGMA foreign_keys=ON)
-│  ├─ bibtex.py             # BibTeX exporter utilities
-│  ├─ services/             # App/business logic
-│  │  ├─ __init__.py
-│  │  ├─ entries_service.py
-│  │  └─ refsets_service.py
-│  └─ ui/                   # Tkinter UI
-│     ├─ __init__.py
-│     └─ main_window.py
+├─ src/
+│  ├─ features
+│  │  ├─ bibtex                          # BibTeX exporter utilities
+│  │  │  ├─ bibtex.py
+│  │  │  └─ tests
+│  │  ├─ database                        # SQLite database layer (PRAGMA foreign_keys=ON)
+│  │  │  ├─ operation                    # Operation for manipulate the data in database
+│  │  │  │  ├─ __init__.py
+│  │  │  │  ├─ entry_ops.py
+│  │  │  │  └─ entry_set.py
+│  │  │  ├─ tests
+│  │  │  └─ db.py                           
+│  │  ├─ entries_services
+│  │  │  └─ entries_service.py
+│  │  ├─ refsets_services
+│  │  │   └─ refsets_service.py
+│  │  └─ ui                               # Tkinter UI
+│  │     ├─ __init__.py
+│  │     └─ main_window.py
+│  └─ main
+│     └─ app.py                           # Entry point (python -m src.main.app)
 └─ README.md
 ```
 

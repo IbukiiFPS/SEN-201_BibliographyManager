@@ -29,5 +29,5 @@ SEN-201_BibliographyManager/
 
 ## Usage
 ```bash
-python -m bibliography_manager.app
+python -m src.main.app
 ```

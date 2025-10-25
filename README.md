@@ -1,24 +1,12 @@
-# Bibliography Manager (Tkinter + SQLite)
+# Bibliography Manager — Staged Development
 
-## Project Layout
-```text
-SEN-201_BibliographyManager/
-├─ bibliography_manager/
-│  ├─ __init__.py
-│  ├─ app.py                # Entry point (python -m bibliography_manager.app)
-│  ├─ db.py                 # SQLite database layer (PRAGMA foreign_keys=ON)
-│  ├─ bibtex.py             # BibTeX exporter utilities
-│  ├─ services/             # App/business logic
-│  │  ├─ __init__.py
-│  │  ├─ entries_service.py
-│  │  └─ refsets_service.py
-│  └─ ui/                   # Tkinter UI
-│     ├─ __init__.py
-│     └─ main_window.py
-└─ README.md
-```
+This repository shows Tkinter + SQLite desktop app.
 
-## Usage
+**Run** (from each stage's root):
 ```bash
 python -m bibliography_manager.app
 ```
+SQLite file `bibliography.db` is created in the working directory.
+
+## Features
+ Full features: CRUD, search, reference sets add/remove, and BibTeX export

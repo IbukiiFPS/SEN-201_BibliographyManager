@@ -1,16 +1,11 @@
+
 import tkinter as tk
-from .db import BibliographyDB
+from .ui.main_window import BibliographyApp
 
 def run():
-    db = BibliographyDB()
-    root = tk.Tk()
-    root.title("Bibliography Manager")
-    tk.Label(root, text="DB initialized. Next stage is for the UI…", padx=12, pady=12).pack()
-    def on_close():
-        db.close()
-        root.destroy()
-    root.protocol("WM_DELETE_WINDOW", on_close)
-    root.mainloop()
+    app = BibliographyApp()
+    app.protocol('WM_DELETE_WINDOW', app.on_close)
+    app.mainloop()
 
 if __name__ == "__main__":
     run()

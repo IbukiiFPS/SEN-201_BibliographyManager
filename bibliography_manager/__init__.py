@@ -1,1 +1,1 @@
-__all__=['app','db']
+__all__=['app','db','bibtex']

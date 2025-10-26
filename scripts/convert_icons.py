@@ -1,6 +1,8 @@
 from PIL import Image
-import os
 import sys
+import os
+import platform
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,26 +18,31 @@ img.save(ico_path, format="ICO", sizes=[(16,16), (32,32), (48,48), (64,64), (128
 print(f"Windows icon created → {ico_path}")
 
 # --- macOS .icns ---
-try:
-    import icnsutil
-    icns_path = ASSETS / "mac.icns"
+if platform.system().lower() == "darwin":
     iconset_dir = ASSETS / "tmp.iconset"
     iconset_dir.mkdir(exist_ok=True)
-
-    # Create multiple PNG sizes for macOS ICNS
+    
+    # Export standard macOS iconset sizes
     for size in [16, 32, 64, 128, 256, 512, 1024]:
         resized = img.resize((size, size))
         resized.save(iconset_dir / f"icon_{size}x{size}.png")
-
-    icnsutil.create_icns_from_pngs(str(iconset_dir), str(icns_path))
-    print(f"macOS icon created → {icns_path}")
-
-    # Clean up temporary files
+        resized.save(iconset_dir / f"icon_{size}x{size}@2x.png")
+    
+    icns_path = ASSETS / "mac.icns"
+    
+    # Use macOS built-in iconutil command
+    try:
+        subprocess.run(["iconutil", "-c", "icns", str(iconset_dir), "-o", str(icns_path)], check=True)
+        print(f"macOS icon created → {icns_path}")
+    except Exception as e:
+        print(f"macOS icon generation failed: {e}")
+    
+    # Clean up temporary folder
     for file in iconset_dir.glob("*.png"):
         file.unlink()
     iconset_dir.rmdir()
-except ImportError:
-    print("Skipped macOS .icns generation (install with: pip install icnsutil)")
+else:
+    print("Skipping macOS .icns creation (not on macOS).")
 
 # --- Linux PNG (copy/resize) ---
 linux_path = ASSETS / "linux.png"

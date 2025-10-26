@@ -6,7 +6,7 @@ import tempfile
 # Add src to Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..')))
 
-from features.database.implementations import db
+from features.database import db
 
 @pytest.fixture
 def temp_db():

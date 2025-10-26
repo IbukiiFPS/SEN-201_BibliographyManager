@@ -40,7 +40,7 @@ def remove_entry_from_set(connector: sqlite3.Connection, set_id: int, entry_id: 
 def list_entries_in_set(connector: sqlite3.Connection, set_id: int) -> List[Tuple]:
     cursor = connector.cursor()
     cursor.execute('''
-        SELECT e.id, e.authors, e.title, e.venue, e.year, e.tags, e.created_at
+        SELECT e.id, e.authors, e.title, e.venue, e.year, e.publication_date, e.tags, e.created_at
         FROM entries e
         JOIN set_entries s ON e.id = s.entry_id
         WHERE s.set_id = ?

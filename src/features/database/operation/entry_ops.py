@@ -11,7 +11,7 @@ def add_entry(connector: sqlite3.Connection, **kwargs) -> int:
     Optional fields: venue, year, volume, number, pages, doi, url, tags
     """
     required_fields = ['authors', 'title']
-    optional_fields = ['venue', 'year', 'volume', 'number', 'pages', 'doi', 'url', 'tags']
+    optional_fields = ['venue', 'year', 'publication_date', 'volume', 'number', 'pages', 'doi', 'url', 'tags']
 
     # Validate required fields
     for field in required_fields:
@@ -50,7 +50,7 @@ def delete_entry(connector: sqlite3.Connection, entry_id: int) -> None:
 
 def list_entries(connector: sqlite3.Connection, where_clause: Optional[str] = None, params: Sequence[Any] = ()) -> List[Tuple]:
     cursor = connector.cursor()
-    sql = 'SELECT id, authors, title, venue, year, tags, created_at FROM entries'
+    sql = 'SELECT id, authors, title, venue, year, publication_date, tags, created_at FROM entries'
     if where_clause:
         sql += ' WHERE ' + where_clause
     sql += ' ORDER BY created_at DESC'

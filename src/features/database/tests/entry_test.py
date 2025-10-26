@@ -167,4 +167,15 @@ def test_update_entry_no_fields(temp_db):
     assert len(entries) == 1
     assert entries[0][2] == "Title Before No-Op Update"  # title is the third field
     
+def test_add_entry_with_publication_date(temp_db):
+    database = temp_db
+    kwargs = {
+        "authors": "Taylor, T.",
+        "title": "Entry with Publication Date",
+        "publication_date": "2024-01-15"
+    }
+    entry_id = database.add_entry(**kwargs)
+    entry = database.get_entry(entry_id)
+    assert entry is not None
+    assert entry['publication_date'] == "2024-01-15"
     

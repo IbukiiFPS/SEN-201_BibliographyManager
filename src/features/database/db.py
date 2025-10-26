@@ -28,6 +28,7 @@ class BibliographyDB:
                 title TEXT NOT NULL,
                 venue TEXT,
                 year INTEGER,
+                publication_date TEXT,
                 volume TEXT,
                 number TEXT,
                 pages TEXT,

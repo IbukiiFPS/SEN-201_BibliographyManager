@@ -1,6 +1,4 @@
-
-import tkinter as tk
-from ..features.ui.main_window import BibliographyApp
+from features.ui.main_window import BibliographyApp
 
 def run():
     app = BibliographyApp()

@@ -1,4 +1,4 @@
-from features.ui.main_window import BibliographyApp
+from src.features.ui.main_window import BibliographyApp
 
 def run():
     app = BibliographyApp()

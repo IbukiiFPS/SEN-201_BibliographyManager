@@ -1,75 +1,103 @@
-import sqlite3
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from __future__ import annotations
+from typing import Any, Iterable
 
-# ---------- Entry operations ----------
+from src.features.database.db import BibliographyDB
 
-def add_entry(connector: sqlite3.Connection, **kwargs) -> int:
-    """
-    Adds a new bibliographic entry using keyword arguments.
-    Required fields: authors, title
-    Optional fields: venue, year, volume, number, pages, doi, url, tags
-    """
-    required_fields = ['authors', 'title']
-    optional_fields = ['venue', 'year', 'publication_date', 'volume', 'number', 'pages', 'doi', 'url', 'tags']
+def _norm_text(s: str | None) -> str:
+    return (s or "").strip().lower()
 
-    # Validate required fields
-    for field in required_fields:
-        if field not in kwargs or not str(kwargs[field]).strip():
-            raise ValueError(f"{field.capitalize()} is required")
+def _norm_pubdate(s: str | None) -> str:
+    return (s or "").strip()
 
-    # Prepare values
-    created_at = datetime.utcnow().isoformat()
-    values = [kwargs.get(field) for field in required_fields + optional_fields] + [created_at]
-    sql = f"INSERT INTO entries ({', '.join(required_fields + optional_fields)}, created_at) VALUES ({', '.join(['?'] * len(values))})"
-    # Build SQL dynamically (but safely)
-    cursor = connector.cursor()
-    cursor.execute( sql, values)
-    connector.commit()
-    return cursor.lastrowid
+def find_duplicate_id(db: BibliographyDB, authors: str, title: str, publication_date: str | None, exclude_id: int | None = None) -> int | None:
+    nt = _norm_text(title)
+    na = _norm_text(authors)
+    npd = _norm_pubdate(publication_date)
+    c = db.conn.cursor()
+    if exclude_id is None:
+        c.execute("""
+            SELECT id FROM entries
+            WHERE lower(trim(title)) = ?
+              AND lower(trim(authors)) = ?
+              AND ifnull(trim(publication_date), '') = ?
+            LIMIT 1
+        """, (nt, na, npd))
+    else:
+        c.execute("""
+            SELECT id FROM entries
+            WHERE lower(trim(title)) = ?
+              AND lower(trim(authors)) = ?
+              AND ifnull(trim(publication_date), '') = ?
+              AND id <> ?
+            LIMIT 1
+        """, (nt, na, npd, exclude_id))
+    row = c.fetchone()
+    return row[0] if row else None
 
-def update_entry(connector: sqlite3.Connection, entry_id: int, **kwargs: Any) -> None:
+def add_entry(db: BibliographyDB, **kwargs) -> int:
+    authors = (kwargs.get("authors") or "").strip()
+    title = (kwargs.get("title") or "").strip()
+    if not authors or not title:
+        raise ValueError("Authors and Title are required")
+
+    dup_id = find_duplicate_id(db, authors, title, kwargs.get("publication_date"))
+    if dup_id is not None:
+        raise ValueError(f"Duplicate entry detected (same Title + Authors + Publication Date) as id {dup_id}")
+
+    created_at = db.utcnow_iso()
+    c = db.conn.cursor()
+    c.execute(
+        """INSERT INTO entries
+           (authors, title, venue, year, publication_date, volume, number, pages, doi, url, tags, created_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",                (                    authors,                    title,                    kwargs.get("venue"),                    kwargs.get("year"),                    kwargs.get("publication_date"),                    kwargs.get("volume"),                    kwargs.get("number"),                    kwargs.get("pages"),                    kwargs.get("doi"),                    kwargs.get("url"),                    kwargs.get("tags"),                    created_at,                ),            )
+    db.conn.commit()
+    return c.lastrowid
+
+def update_entry(db: BibliographyDB, entry_id: int, **kwargs):
     if not kwargs:
         return
-    fields = []
-    values = []
+    c = db.conn.cursor()
+    c.execute("SELECT authors, title, publication_date FROM entries WHERE id = ?", (entry_id,))
+    row = c.fetchone()
+    if not row:
+        raise ValueError("Entry not found")
+    cur_authors, cur_title, cur_pubdate = row
+    new_authors = kwargs.get("authors", cur_authors)
+    new_title = kwargs.get("title", cur_title)
+    new_pubdate = kwargs.get("publication_date", cur_pubdate)
+
+    dup_id = find_duplicate_id(db, new_authors, new_title, new_pubdate, exclude_id=entry_id)
+    if dup_id is not None:
+        raise ValueError(f"Update would create a duplicate of id {dup_id} (same Title + Authors + Publication Date)")
+
+    fields, values = [], []
     for k, v in kwargs.items():
         fields.append(f"{k} = ?")
         values.append(v)
     values.append(entry_id)
     sql = f"UPDATE entries SET {', '.join(fields)} WHERE id = ?"
-    cursor = connector.cursor()
-    cursor.execute(sql, values)
-    connector.commit()
+    c.execute(sql, values)
+    db.conn.commit()
 
-def delete_entry(connector: sqlite3.Connection, entry_id: int) -> None:
-    cursor = connector.cursor()
-    cursor.execute('DELETE FROM entries WHERE id = ?', (entry_id,))
-    # rows in set_entries will cascade
-    connector.commit()
+def delete_entry(db: BibliographyDB, entry_id: int):
+    c = db.conn.cursor()
+    c.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
+    db.conn.commit()
 
-def list_entries(connector: sqlite3.Connection, where_clause: Optional[str] = None, params: Sequence[Any] = ()) -> List[Tuple]:
-    cursor = connector.cursor()
-    sql = 'SELECT id, authors, title, venue, year, publication_date, tags, created_at FROM entries'
+def list_entries(db: BibliographyDB, where_clause: str | None = None, params: Iterable[Any] = ()):
+    c = db.conn.cursor()
+    sql = "SELECT id, authors, title, venue, year, publication_date, tags, created_at FROM entries"
     if where_clause:
-        sql += ' WHERE ' + where_clause
-    sql += ' ORDER BY created_at DESC'
-    cursor.execute(sql, params)
-    return cursor.fetchall()
+        sql += " WHERE " + where_clause
+    sql += " ORDER BY created_at DESC"
+    c.execute(sql, tuple(params) if params else ())
+    return c.fetchall()
 
-def get_entry(connector: sqlite3.Connection, entry_id: int) -> Optional[Dict[str, Any]]:
-    cursor = connector.cursor()
-    cursor.execute('SELECT * FROM entries WHERE id = ?', (entry_id,))
-    row = cursor.fetchone()
+def get_entry(db: BibliographyDB, entry_id: int) -> dict | None:
+    c = db.conn.cursor()
+    c.execute("SELECT * FROM entries WHERE id = ?", (entry_id,))
+    row = c.fetchone()
     if not row:
         return None
-    cols = [d[0] for d in cursor.description]
+    cols = [d[0] for d in c.description]
     return dict(zip(cols, row))
-
-def get_entry_id_by_title(connector: sqlite3.Connection, title: str) -> Optional[int]:
-    cursor = connector.cursor()
-    cursor.execute('SELECT id FROM entries WHERE title = ?', (title,))
-    row = cursor.fetchone()
-    if not row:
-        return None
-    return row[0]

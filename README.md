@@ -1,5 +1,7 @@
 # Bibliography Manager (Tkinter + SQLite)
 
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/1c9bb424-55e9-4359-b29e-ae55fb12c222" />
+
 ## Project Layout
 ```text
 SEN-201_BibliographyManager/

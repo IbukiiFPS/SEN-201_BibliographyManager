@@ -35,7 +35,7 @@ python -m src.main.app
 
 ## Requirements
 
-- Python 3.10+ (3.11 also OK)
+- Python 3.10+
 - Tkinter installed for your OS
 
 ### Install Tkinter
